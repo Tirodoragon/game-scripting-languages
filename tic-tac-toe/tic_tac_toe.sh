@@ -8,9 +8,23 @@ RED_X="${RED}X${NO_COLOR}"
 BLUE_O="${BLUE}O${NO_COLOR}"
 
 board=($BLUE_O $RED_X $RED_X $RED_X $BLUE_O $BLUE_O $RED_X $BLUE_O $BLUE_O)
-
 player1_name="Player 1"
 player2_name="Player 2"
+current_player=1
+game_over=false
+moves=0
+save_file="tic_tac_toe_save.txt"
+
+winning_combinations=(
+	0 1 2
+	3 4 5
+	6 7 8
+	0 3 6
+	1 4 7
+	2 5 8
+	0 4 8
+	2 4 6
+)
 
 function print_board {
 	clear
@@ -47,21 +61,6 @@ function get_player_names {
 	done
 }
 
-winning_combinations=(
-	0 1 2
-	3 4 5
-	6 7 8
-	0 3 6
-	1 4 7
-	2 5 8
-	0 4 8
-	2 4 6
-)
-
-current_player=1
-game_over=false
-moves=0
-
 function play {
 	while ! $game_over; do
 		read -p "$([ $current_player == 1 ] && echo "$player1_name" || echo "$player2_name"), enter your move (1-9): " move
@@ -97,17 +96,78 @@ function play {
 		fi
 
 		current_player=$((3 - current_player))
+
+		save_game
 	done
 }
 
-function start_game {
-	print_board
-	echo -e "Press any key to start the game!${NO_COLOR}"
-	read -n 1 -s -r
+function save_game {
+	echo "$player1_name $player2_name $current_player $game_over $moves" > "$save_file"
+	for cell in "${board[@]}"; do
+		echo "$cell"
+	done >> "$save_file"
+
+	if $game_over; then
+		rm "$save_file"
+	fi
+}
+
+function load_game {
+	read -r player1_name player2_name current_player game_over moves < "$save_file"
+	index=0
+	while read -r cell; do
+		board[$index]=$cell
+		((index++))
+	done < <(tail -n +2 "$save_file")
+
+	if [[ ! "$current_player" =~ ^[12]$ ]] || [[ ! "$game_over" =~ ^(true|false)$ ]] || [[ ! "$moves" =~ ^[0-9]+$ ]] || [ "${#board[@]}" -ne 9 ]; then
+		echo "Invalid save file data. Starting a new game."
+		new_game
+	else
+		print_board
+	fi
+	play
+}
+
+function new_game {
 	get_player_names
+	current_player=$((RANDOM % 2 + 1))
+	echo "$([ $current_player == 1 ] && echo "$player1_name" || echo "$player2_name") starts the game!"
+	sleep 2
 	board=(1 2 3 4 5 6 7 8 9)
 	print_board
 	play
+}
+
+function start_game {
+	if [ -f "$save_file" ]; then
+		while true; do
+			echo "Do you want to start a new game or continue the previously interrupted one?"
+			echo "1. New game"
+			echo "2. Continue previously interrupted game"
+			read -r -p "Enter your choice: " choice
+			if [[ "$choice" =~ ^[1-2]$ ]]; then
+				case $choice in
+					1)
+						new_game
+						break
+						;;
+					2)
+						load_game
+						break
+						;;
+				esac
+			else
+				echo "Invalid choice. Please enter 1 or 2."
+				echo
+			fi
+		done
+	else
+		print_board
+		echo "No saved game found. Press any key to start a new game!"
+		read -n 1 -s -r
+		new_game
+	fi
 }
 
 start_game
