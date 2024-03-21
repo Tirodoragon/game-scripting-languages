@@ -14,6 +14,7 @@ current_player=1
 game_over=false
 moves=0
 save_file="tic_tac_toe_save.txt"
+opponent_choice=0
 
 winning_combinations=(
 	0 1 2
@@ -61,23 +62,45 @@ function get_player_names {
 	done
 }
 
+function move_ai {
+	echo "AI is thinking."
+	sleep 1
+
+	free_cells=()
+	for i in "${!board[@]}"; do
+		if [[ ${board[$i]} =~ [1-9] ]] && [[ ${board[$i]} != "${RED_X}" ]] && [[ ${board[$i]} != "${BLUE_O}" ]]; then
+			free_cells+=($i)
+		fi
+	done
+
+	random_move=$((RANDOM % ${#free_cells[@]}))
+	move=${free_cells[$random_move]}
+	board[$move]="${BLUE_O}"
+
+	print_board
+}
+
 function play {
 	while ! $game_over; do
-		read -p "$([ $current_player == 1 ] && echo "$player1_name" || echo "$player2_name"), enter your move (1-9): " move
+		if [ $opponent_choice -eq 2 ] && [ $current_player -eq 2 ]; then
+			move_ai
+		else
+			read -p "$([ $current_player == 1 ] && echo "$player1_name" || echo "$player2_name"), enter your move (1-9): " move
 
-		if ! [[ "$move" =~ ^[1-9]$ ]]; then
-			echo "Invalid input. Please enter a number between 1 and 9."
-			continue
+			if ! [[ "$move" =~ ^[1-9]$ ]]; then
+				echo "Invalid input. Please enter a number between 1 and 9."
+				continue
+			fi
+
+			move=$((move - 1))
+
+			if [[ ${board[$move]} == "${RED_X}" || ${board[$move]} == "${BLUE_O}" ]]; then
+				echo "Invalid move. Try again."
+				continue
+			fi
+
+			board[$move]=$([ $current_player == 1 ] && echo "${RED_X}" || echo "${BLUE_O}")
 		fi
-
-		move=$((move - 1))
-
-		if [[ ${board[$move]} == "${RED_X}" || ${board[$move]} == "${BLUE_O}" ]]; then
-			echo "Invalid move. Try again."
-			continue
-		fi
-
-		board[$move]=$([ $current_player == 1 ] && echo "${RED_X}" || echo "${BLUE_O}")
 
 		print_board
 
@@ -130,7 +153,23 @@ function load_game {
 }
 
 function new_game {
-	get_player_names
+	while true; do
+		echo "Choose an opponent:"
+		echo "1. Against another player"
+		echo "2. Against AI"
+		read -r -p "Enter your choice: " opponent_choice
+		if [[ "$opponent_choice" =~ ^[12]$ ]]; then
+			break
+		else
+			echo "Invalid choice. Please enter 1 or 2."
+		fi
+	done
+	if [[ "$opponent_choice" == 1 ]]; then
+		get_player_names
+	else
+		player1_name="Player"
+		player2_name="AI"
+	fi
 	current_player=$((RANDOM % 2 + 1))
 	echo "$([ $current_player == 1 ] && echo "$player1_name" || echo "$player2_name") starts the game!"
 	sleep 2
