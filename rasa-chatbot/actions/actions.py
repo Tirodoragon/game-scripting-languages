@@ -4,24 +4,17 @@ from datetime import datetime
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 
-OPENING_HOURS = {
-    "Monday": {"open": 8, "close": 20},
-    "Tuesday": {"open": 8, "close": 20},
-    "Wednesday": {"open": 10, "close": 16},
-    "Thursday": {"open": 8, "close": 20},
-    "Friday": {"open": 8, "close": 20},
-    "Saturday": {"open": 10, "close": 16},
-    "Sunday": {"open": 0, "close": 0}
-}
+import json
 
-MENU_ITEMS = [
-    {"dish_name": "Lasagne", "cost": "$16", "preparation_time": "1 h"},
-    {"dish_name": "Pizza", "cost": "$12", "preparation_time": "30 min"},
-    {"dish_name": "Hot-dog", "cost": "$4", "preparation_time": "6 min"},
-    {"dish_name": "Burger", "cost": "$12.5", "preparation_time": "12 min"},
-    {"dish_name": "Spaghetti Carbonara", "cost": "$15", "preparation_time": "30 min"},
-    {"dish_name": "Tiramisu", "cost": "$11", "preparation_time": "9 min"}
-]
+
+def load_json_file(file_path):
+    with open(file_path, "r") as file:
+        data = json.load(file)
+    return data.get('items', [])
+
+
+OPENING_HOURS = load_json_file("data/opening_hours.json")
+MENU_ITEMS = load_json_file("data/menu.json")
 
 
 def count_delimiters_in_message(message: str) -> int:
@@ -107,22 +100,24 @@ class ActionListMenu(Action):
         return "action_list_menu"
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        max_lengths = {"dish_name": 0, "cost": 0, "preparation_time": len("Preparation_time")}
+        max_lengths = {"name": 0, "price": len("Price"), "preparation_time": len("Preparation_time")}
         for item in MENU_ITEMS:
             for key, value in item.items():
-                max_lengths[key] = max(max_lengths[key], len(str(value)))
-        max_dish_name_length = max(max_lengths["dish_name"], len("Dish_name"))
+                if key == "price" or key == "preparation_time":
+                    value = str(value)
+                max_lengths[key] = max(max_lengths[key], len(value))
+        max_name_length = max(max_lengths["name"], len("Name"))
 
         table = "```markdown\n"
-        table += (f"| {'Dish_name'.center(max_dish_name_length)} | {'Cost'.center(max_lengths['cost'])} | "
+        table += (f"| {'Name'.center(max_name_length)} | {'Price'.center(max(max_lengths['price'], len('Price'))) } | "
                   f"{'Preparation_time'.center(max_lengths['preparation_time'])} |\n")
-        table += (f"|{'-' * (max_dish_name_length + 2)}|{'-' * (max_lengths['cost'] + 2)}|"
+        table += (f"|{'-' * (max_name_length + 2)}|{'-' * (max(max_lengths['price'], len('Price')) + 2)}|"
                   f"{'-' * (max_lengths['preparation_time'] + 2)}|\n")
         for item in MENU_ITEMS:
-            dish_name = item["dish_name"].center(max_dish_name_length)
-            cost = item["cost"].center(max_lengths["cost"])
-            prep_time = item["preparation_time"].center(max_lengths["preparation_time"])
-            table += f"| {dish_name} | {cost} | {prep_time} |\n"
+            name = item["name"].center(max_name_length)
+            price = str(item["price"]).center(max_lengths["price"])
+            prep_time = str(item["preparation_time"]).center(max_lengths["preparation_time"])
+            table += f"| {name} | {price} | {prep_time} |\n"
         table += "```"
 
         dispatcher.utter_message(text=table)
@@ -142,7 +137,7 @@ class ActionSingleItemOrder(Action):
 
         if requested_items:
             for requested_item in requested_items:
-                if any(item['dish_name'].lower() == requested_item.lower() for item in MENU_ITEMS):
+                if any(item['name'].lower() == requested_item.lower() for item in MENU_ITEMS):
                     dispatcher.utter_message("Your order has been placed. Thank you!")
                     return []
 
@@ -163,7 +158,7 @@ class ActionPlaceOrderWithMultipleItems(Action):
 
         food_entities = [entity['value'] for entity in tracker.latest_message.get('entities', [])
                          if entity['entity'] == 'food']
-        menu_dish_names = [item['dish_name'].lower() for item in MENU_ITEMS]
+        menu_dish_names = [item['name'].lower() for item in MENU_ITEMS]
         unavailable_items = [item for item in food_entities if item.lower() not in menu_dish_names]
         available_items = [item for item in food_entities if item.lower() in menu_dish_names]
         if len(food_entities) == items_count:
@@ -211,7 +206,7 @@ class ActionPlaceOrderWithAdditionalRequest(Action):
                          if entity['entity'] == 'food']
         ingredients_entities = [entity['value'] for entity in tracker.latest_message.get('entities', [])
                                 if entity['entity'] == 'ingredient']
-        menu_dish_names = [item['dish_name'].lower() for item in MENU_ITEMS]
+        menu_dish_names = [item['name'].lower() for item in MENU_ITEMS]
         allowed_ingredients = ["tomatoes", "meat", "mustard", "pickles", "ketchup", "onions", "cheese"]
         available_items = [item for item in food_entities if item.lower() in menu_dish_names]
         correct_additional_requests = [item for item in ingredients_entities if item.lower() in allowed_ingredients]
