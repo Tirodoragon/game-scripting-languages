@@ -1,0 +1,38 @@
+version: "3.1"
+
+stories:
+
+- story: is the restaurant open at the specific time
+  steps:
+  - intent: is_open
+  - action: action_check_is_open
+
+- story: get opening hours for the specific day
+  steps:
+  - intent: opening_hours
+  - action: action_get_opening_hours
+
+- story: check if the restaurant is currently open
+  steps:
+  - intent: currently_open
+  - action: action_check_currently_open
+
+- story: list menu items
+  steps:
+  - intent: list_menu
+  - action: action_list_menu
+
+- story: place a single item order
+  steps:
+  - intent: single_item_order
+  - action: action_place_single_item_order
+
+- story: place an order with multiple items
+  steps:
+  - intent: order_with_multiple_items
+  - action: action_place_order_with_multiple_items
+
+- story: place an order with additional request
+  steps:
+  - intent: order_with_additional_request
+  - action: action_place_order_with_additional_request

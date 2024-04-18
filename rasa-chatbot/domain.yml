@@ -1,0 +1,50 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - is_open
+  - opening_hours
+  - currently_open
+  - list_menu
+  - single_item_order
+  - order_with_multiple_items
+  - order_with_additional_request
+
+entities:
+  - day
+  - time
+  - food
+  - ingredient
+
+responses:
+  utter_greet:
+  - text: "Hello! How can I assist you today?"
+
+  utter_goodbye:
+  - text: "Goodbye! Have a great day!"
+
+  utter_is_open:
+  - text: "Yes, the restaurant is open on {day} at {time}."
+
+  utter_opening_hours:
+  - text: "The restaurant is open on {day} from {open_time} to {close_time}."
+
+  utter_currently_open:
+  - text: "Yes, the restaurant is currently open."
+
+  utter_currently_closed:
+  - text: "No, the restaurant is currently closed."
+
+actions:
+  - action_check_is_open
+  - action_get_opening_hours
+  - action_check_currently_open
+  - action_list_menu
+  - action_place_single_item_order
+  - action_place_order_with_multiple_items
+  - action_place_order_with_additional_request
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
