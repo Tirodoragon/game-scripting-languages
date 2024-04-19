@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Text, Dict, List
 
 from rasa_sdk import Action, Tracker
@@ -110,7 +110,7 @@ class ActionListMenu(Action):
         max_name_length = max(max_lengths["name"], len("Name"))
 
         table = "```markdown\n"
-        table += (f"| {'Name'.center(max_name_length)} | {'Price'.center(max(max_lengths['price'], len('Price'))) } | "
+        table += (f"| {'Name'.center(max_name_length)} | {'Price'.center(max(max_lengths['price'], len('Price')))} | "
                   f"{'Preparation_time'.center(max_lengths['preparation_time'])} |\n")
         table += (f"|{'-' * (max_name_length + 2)}|{'-' * (max(max_lengths['price'], len('Price')) + 2)}|"
                   f"{'-' * (max_lengths['preparation_time'] + 2)}|\n")
@@ -288,7 +288,7 @@ class ActionConfirmOrder(Action):
             dispatcher.utter_message("Alright, it seems like you haven't ordered anything this time. "
                                      "We hope you find something for you next time. Goodbye and see you again!")
 
-        return [SlotSet("current_order", None)]
+        return []
 
 
 class ActionResetOrder(Action):
@@ -297,4 +297,64 @@ class ActionResetOrder(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         dispatcher.utter_message("You didn't confirm your order so it got reset. Please order again.")
+        return [SlotSet("current_order", None)]
+
+
+def extract_base_name(item_name: str) -> str:
+    base_names = {
+        "spaghetti carbonara": "spaghetti",
+        "tiramisu": "tiramisu",
+        "lasagne": "lasagne",
+        "pizza": "pizza",
+        "burger": "burger",
+        "hot-dog": "hot-dog"
+    }
+    for base, full_name in base_names.items():
+        if base in item_name:
+            return base
+    return ""
+
+
+def is_open(current_time: datetime) -> bool:
+    weekday = current_time.strftime("%A")
+    opening_hours = OPENING_HOURS.get(weekday, {})
+    opening_hour = opening_hours.get("open", 0)
+    closing_hour = opening_hours.get("close", 0)
+    current_hour = current_time.hour
+    return opening_hour <= current_hour < closing_hour
+
+
+class ActionConfirmPickupTime(Action):
+    def name(self) -> Text:
+        return "action_confirm_pickup_time"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        current_order = tracker.get_slot("current_order")
+        items_with_base_names = []
+        if isinstance(current_order, str):
+            items_with_base_names = [extract_base_name(item.lower()) for item in current_order.split(',')]
+        elif isinstance(current_order, list):
+            items_with_base_names = [extract_base_name(item.lower()) for item in current_order]
+
+        items_with_base_names = [item for item in items_with_base_names if item]
+
+        max_prep_time = max(item["preparation_time"] for item in MENU_ITEMS
+                            if item["name"].lower() in items_with_base_names)
+
+        current_time = datetime.now()
+
+        if not is_open(current_time):
+            dispatcher.utter_message("Apologies, the restaurant is currently closed.")
+            return [SlotSet("current_order", None)]
+
+        pickup_time = current_time + timedelta(hours=max_prep_time)
+
+        closing_hour = OPENING_HOURS[current_time.strftime("%A")]["close"]
+        closing_time = current_time.replace(hour=closing_hour, minute=0, second=0)
+        if pickup_time > closing_time:
+            dispatcher.utter_message("It's too late to place an order for that time. The restaurant will be closed.")
+            return [SlotSet("current_order", None)]
+
+        dispatcher.utter_message("Your order will be ready for pick-up at {}.".format(pickup_time.strftime("%I:%M %p")))
+
         return [SlotSet("current_order", None)]

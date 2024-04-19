@@ -49,9 +49,6 @@ responses:
   utter_ask_for_additional_order:
   - text: "What else would you like to order?"
 
-  utter_order_confirmed:
-  - text: "Thank you, your order has been confirmed."
-
 actions:
   - action_check_is_open
   - action_get_opening_hours
@@ -62,6 +59,7 @@ actions:
   - action_place_order_with_additional_request
   - action_confirm_order
   - action_reset_order
+  - action_confirm_pickup_time
 
 session_config:
   session_expiration_time: 60

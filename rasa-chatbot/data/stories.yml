@@ -83,7 +83,7 @@ stories:
   steps:
   - action: action_confirm_order
   - intent: confirm
-  - action: utter_order_confirmed
+  - action: action_confirm_pickup_time
 
 - story: user declines order
   steps:
