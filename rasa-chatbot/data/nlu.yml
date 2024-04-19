@@ -302,41 +302,55 @@ nlu:
 
 - intent: order_with_additional_request
   examples: |
-    - I would like to order [Burger](food) without [Tomatoes](ingredient)
-    - I would like to order [Pizza](food) wit hout [Meat](ingredient)
-    - I woul like o order [Hot-dog](food) without [Mustard](ingredient)
-    - I woould like to ordre [Burger](food) withoit [Pickles](ingredient)
-    - I woudl like to order [Pizza](food) without [Tomatoes](ingredient)
-    - I would like tmow order [Hot-dog](food) wihtout [Ketchup](ingredient)
-    - I would like to ordder [Burger](food) iwthout [Ketchup](ingredient)
-    - I wohld like to order [Burger](food) wtihout [Mustard](ingredient)
-    - II would liket o order [Hot-dog](food) without [Onions](ingredient)
-    - I would like tk order [Burger](food) wthout [Onions](ingredient)
-    - I would like to order [Burger](food) ithut [Meat](ingredient)
-    - I want to order [Spaghetti Carbonara](food) with extra [Cheese](ingredient)
-    - I want to krder [Burger](food) with extra [Cheese](ingredient)
-    - I wwlnt to order [Pizza](food) with extra [Cheese](ingredient)
-    - I want to o rder [Hot-dog](food) with dxtra [Cheese](ingredient)
-    - I wannt to order [Hot-dog](food) with etra [Ketchup](ingredient)
-    - I want to order [Hot-dog](food) sith extra [Mustard](ingredient)
-    - I want tom order [Pizza](food) with extra [Meat](ingredient)
-    - I want tl ordler [Lasagne](food) with extra [Meat](ingredient)
-    - I waat to order [Lasagne](food) with extra [Cheese](ingredient)
-    - I want to orrder [Burger](food) with extra [Tomatoes](ingredient)
-    - I wanat to order [Burger](food) with  extra [Pickles](ingredient)
-    - I'll take [Hot-dog](food) with [Onions](ingredient)
-    - I'lltake [Hot-dog](food) with [Mustard](ingredient)
-    - I'll take [Hot-dog](food) wit [Ketchup](ingredient)
-    - Ill take  [Hot-dog](food) with [Cheese](ingredient)
-    - Il' ltake [Burger](food) with [Meat](ingredient)
-    - I'pl taoe [Burger](food) with [Pickles](ingredient)
-    - I'ol  take [Burger](food) with [Cheese](ingredient)
-    - I'llc take [Burger](food) with [Tomatoes](ingredient)
-    - I'll take [Burger](food) wtih [Onions](ingredient)
-    - I'll take [Pizza](food) witnb [Meat](ingredient)
-    - I'llt aek [Pizza](food) with [Cheese](ingredient)
-    - I would like to order [Burger](food) without [Tomatoes](ingredient) and [Pizza](food) without [Meat](ingredient)
-    - I want to order [Spaghetti Carbonara](food) with extra [Cheese](ingredient), [Hot-dog](food) with [Onions](ingredient) and [Burger](food) without [Pickles](ingredient)
+    - I would like to order [Burger](food) [without](modifier) [Tomatoes](ingredient)
+    - I would like to order [Pizza](food) [without](modifier) [Meat](ingredient)
+    - I woul like o order [Hot-dog](food) [without](modifier) [Mustard](ingredient)
+    - I woould like to ordre [Burger](food) [without](modifier) [Pickles](ingredient)
+    - I woudl like to order [Pizza](food) [without](modifier) [Tomatoes](ingredient)
+    - I would like tmow order [Hot-dog](food) [without](modifier) [Ketchup](ingredient)
+    - I would like to ordder [Burger](food) [without](modifier) [Ketchup](ingredient)
+    - I wohld like to order [Burger](food) [without](modifier) [Mustard](ingredient)
+    - II would liket o order [Hot-dog](food) [without](modifier) [Onions](ingredient)
+    - I would like tk order [Burger](food) [without](modifier) [Onions](ingredient)
+    - I would like to order [Burger](food) [without](modifier) [Meat](ingredient)
+    - I want to order [Spaghetti Carbonara](food) [with extra](modifier) [Cheese](ingredient)
+    - I want to krder [Burger](food) [with extra](modifier) [Cheese](ingredient)
+    - I wwlnt to order [Pizza](food) [with extra](modifier) [Cheese](ingredient)
+    - I want to o rder [Hot-dog](food) [with extra](modifier) [Cheese](ingredient)
+    - I wannt to order [Hot-dog](food) [with extra](modifier) [Ketchup](ingredient)
+    - I want to order [Hot-dog](food) [with extra](modifier) [Mustard](ingredient)
+    - I want tom order [Pizza](food) [with extra](modifier) [Meat](ingredient)
+    - I want tl ordler [Lasagne](food) [with extra](modifier) [Meat](ingredient)
+    - I waat to order [Lasagne](food) [with extra](modifier) [Cheese](ingredient)
+    - I want to orrder [Burger](food) [with extra](modifier) [Tomatoes](ingredient)
+    - I wanat to order [Burger](food) [with extra](modifier) [Pickles](ingredient)
+    - I'll take [Hot-dog](food) [with](modifier) [Onions](ingredient)
+    - I'lltake [Hot-dog](food) [with](modifier) [Mustard](ingredient)
+    - I'll take [Hot-dog](food) [with](modifier) [Ketchup](ingredient)
+    - Ill take  [Hot-dog](food) [with](modifier) [Cheese](ingredient)
+    - Il' ltake [Burger](food) [with](modifier) [Meat](ingredient)
+    - I'pl taoe [Burger](food) [with](modifier) [Pickles](ingredient)
+    - I'ol  take [Burger](food) [with](modifier) [Cheese](ingredient)
+    - I'llc take [Burger](food) [with](modifier) [Tomatoes](ingredient)
+    - I'll take [Burger](food) [with](modifier) [Onions](ingredient)
+    - I'll take [Pizza](food) [with](modifier) [Meat](ingredient)
+    - I'llt aek [Pizza](food) [with](modifier) [Cheese](ingredient)
+    - I would like to order [Burger](food) [without](modifier) [Tomatoes](ingredient) and [Pizza](food) [without[(modifier) [Meat](ingredient)
+    - I want to order [Spaghetti Carbonara](food) [with extra](modifier) [Cheese](ingredient), [Hot-dog](food) [with](modifier) [Onions](ingredient) and [Burger](food) [without](modifier) [Pickles](ingredient)
+
+- intent: confirm
+  examples: |
+    - yes
+    - yeah
+    - sure
+    - absolutely
+
+- intent: deny
+  examples: |
+    - no
+    - nope
+    - nah
+    - not really
 
 - synonym: Monday
   examples: |

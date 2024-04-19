@@ -36,3 +36,57 @@ stories:
   steps:
   - intent: order_with_additional_request
   - action: action_place_order_with_additional_request
+
+- story: place a single order and add more to the order
+  steps:
+    - intent: single_item_order
+    - action: action_place_single_item_order
+    - intent: confirm
+    - action: utter_ask_for_additional_order
+
+- story: place an order with multiple items and add more to the order
+  steps:
+  - intent: order_with_multiple_items
+  - action: action_place_order_with_multiple_items
+  - intent: confirm
+  - action: utter_ask_for_additional_order
+
+- story: place an order with additional request and add more to the order
+  steps:
+  - intent: order_with_additional_request
+  - action: action_place_order_with_additional_request
+  - intent: confirm
+  - action: utter_ask_for_additional_order
+
+- story: place a single order and proceed to confirm the order
+  steps:
+    - intent: single_item_order
+    - action: action_place_single_item_order
+    - intent: deny
+    - action: action_confirm_order
+
+- story: place an order with multiple items and proceed to confirm the order
+  steps:
+  - intent: order_with_multiple_items
+  - action: action_place_order_with_multiple_items
+  - intent: deny
+  - action: action_confirm_order
+
+- story: place an order with additional request and proceed to confirm the order
+  steps:
+  - intent: order_with_additional_request
+  - action: action_place_order_with_additional_request
+  - intent: deny
+  - action: action_confirm_order
+
+- story: user confirms order
+  steps:
+  - action: action_confirm_order
+  - intent: confirm
+  - action: utter_order_confirmed
+
+- story: user declines order
+  steps:
+  - action: action_confirm_order
+  - intent: deny
+  - action: action_reset_order
