@@ -352,6 +352,16 @@ nlu:
     - nah
     - not really
 
+- intent: delivery_address
+  examples: |
+    - my delivery address is [Kanonicza 15](address)
+    - [Grodzka 24](address)
+    - you can deliver it to [Szeroka 8](address)
+    - [Nowa 5](address) is my delivery address
+    - the delivery should be made to [Stradomska 4](address)
+    - my address for delivery is [Karmelicka 23](address)
+    - I'd like it delivered to [Czapskich 9](address)
+
 - synonym: Monday
   examples: |
     - monday

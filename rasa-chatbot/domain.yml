@@ -12,6 +12,7 @@ intents:
   - order_with_additional_request
   - confirm
   - deny
+  - delivery_address
 
 entities:
   - day
@@ -19,6 +20,7 @@ entities:
   - food
   - ingredient
   - modifier
+  - address
 
 slots:
   current_order:
@@ -26,6 +28,13 @@ slots:
     influence_conversation: true
     mappings:
     - type: custom
+
+  address:
+    type: text
+    influence_conversation: false
+    mappings:
+    - type: from_entity
+      entity: address
 
 responses:
   utter_greet:
@@ -49,6 +58,12 @@ responses:
   utter_ask_for_additional_order:
   - text: "What else would you like to order?"
 
+  utter_ask_about_delivery:
+  - text: "Do you want to have your order delivered to you instead of picking it up yourself?"
+
+  utter_ask_for_address:
+  - text: "What is your delivery address?"
+
 actions:
   - action_check_is_open
   - action_get_opening_hours
@@ -60,6 +75,8 @@ actions:
   - action_confirm_order
   - action_reset_order
   - action_confirm_pickup_time
+  - action_confirm_address
+  - action_confirm_delivery_time
 
 session_config:
   session_expiration_time: 60

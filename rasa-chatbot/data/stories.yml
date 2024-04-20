@@ -79,10 +79,28 @@ stories:
   - intent: deny
   - action: action_confirm_order
 
-- story: user confirms order
+- story: user confirms order with delivery
   steps:
   - action: action_confirm_order
   - intent: confirm
+  - action: utter_ask_about_delivery
+  - intent: confirm
+  - action: utter_ask_for_address
+  - intent: delivery_address
+  - action: action_confirm_address
+  - intent: deny
+  - action: utter_ask_for_address
+  - intent: delivery_address
+  - action: action_confirm_address
+  - intent: confirm
+  - action: action_confirm_delivery_time
+
+- story: user confirms order with pick-up
+  steps:
+  - action: action_confirm_order
+  - intent: confirm
+  - action: utter_ask_about_delivery
+  - intent: deny
   - action: action_confirm_pickup_time
 
 - story: user declines order

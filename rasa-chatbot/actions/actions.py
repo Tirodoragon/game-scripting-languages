@@ -300,6 +300,22 @@ class ActionResetOrder(Action):
         return [SlotSet("current_order", None)]
 
 
+class ActionConfirmAddress(Action):
+    def name(self) -> Text:
+        return "action_confirm_address"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        address = next(tracker.get_latest_entity_values("address"), None)
+
+        if address:
+            dispatcher.utter_message(text=f"Is {address} your delivery address?")
+            return [SlotSet("address", address)]
+        else:
+            dispatcher.utter_message(
+                text="Sorry, we don't deliver to your address.")
+            return [SlotSet("current_order", None)]
+
+
 def extract_base_name(item_name: str) -> str:
     base_names = {
         "spaghetti carbonara": "spaghetti",
@@ -356,5 +372,44 @@ class ActionConfirmPickupTime(Action):
             return [SlotSet("current_order", None)]
 
         dispatcher.utter_message("Your order will be ready for pick-up at {}.".format(pickup_time.strftime("%I:%M %p")))
+
+        return [SlotSet("current_order", None)]
+
+
+class ActionConfirmDeliveryTime(Action):
+    def name(self) -> Text:
+        return "action_confirm_delivery_time"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        current_order = tracker.get_slot("current_order")
+        items_with_base_names = []
+        if isinstance(current_order, str):
+            items_with_base_names = [extract_base_name(item.lower()) for item in current_order.split(',')]
+        elif isinstance(current_order, list):
+            items_with_base_names = [extract_base_name(item.lower()) for item in current_order]
+
+        items_with_base_names = [item for item in items_with_base_names if item]
+
+        max_prep_time = max(item["preparation_time"] for item in MENU_ITEMS
+                            if item["name"].lower() in items_with_base_names)
+
+        current_time = datetime.now()
+
+        if not is_open(current_time):
+            dispatcher.utter_message("Apologies, the restaurant is currently closed.")
+            return [SlotSet("current_order", None)]
+
+        order_time = current_time + timedelta(hours=max_prep_time)
+
+        closing_hour = OPENING_HOURS[current_time.strftime("%A")]["close"]
+        closing_time = current_time.replace(hour=closing_hour, minute=0, second=0)
+        if order_time > closing_time:
+            dispatcher.utter_message("It's too late to place an order for that time. The restaurant will be closed.")
+            return [SlotSet("current_order", None)]
+
+        order_time += timedelta(minutes=30)
+        delivery_time = order_time.strftime("%I:%M %p")
+
+        dispatcher.utter_message("Your order will be delivered around {}.".format(delivery_time))
 
         return [SlotSet("current_order", None)]
