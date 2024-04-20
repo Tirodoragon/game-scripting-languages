@@ -11,6 +11,8 @@ The code I wrote during the Game Scripting Languages course at the Jagiellonian 
 
 Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/tic-tac-toe)
 
+https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/dc02aebb-407b-41ef-85c4-f94acef9bf1d
+
 **Zadanie 2** Python: Czatbot
 
 :white_check_mark: 3.0 [A chatbot with the trained ability to handle at least 3 ways to phrase those intents.](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/bbf1e62966cb762876cec5e771d786342c5b7aeb)
@@ -24,3 +26,5 @@ Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/t
 :white_check_mark: 5.0 [Chatbot should ask and confirm the delivery address instead of pick-up option](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/840c015b3fb81c25d913ac1bb0123d7db5ef7f0f)
 
 Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/rasa-chatbot)
+
+https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/c12fe3a1-c7d8-470d-9de4-f0909a0f0368
