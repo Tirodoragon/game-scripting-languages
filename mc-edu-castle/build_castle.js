@@ -9,17 +9,17 @@ function buildCastle() {
     let offsetZ: number = 0;
 
     if (playerDirection >= 45 && playerDirection < 135) {
-        offsetX = -34
+        offsetX = -47
         offsetZ = -(width / 2)
     } else if (playerDirection >= 135 || playerDirection < -135) {
         offsetX = -(width / 2)
-        offsetZ = -34
+        offsetZ = -47
     } else if (playerDirection >= -135 && playerDirection < -45) {
-        offsetX = 14
+        offsetX = 27
         offsetZ = -(width / 2)
     } else {
         offsetX = -(width / 2)
-        offsetZ = 14
+        offsetZ = 27
     }
 
     const castleX: number = playerPos.getValue(Axis.X) + offsetX;
@@ -30,6 +30,7 @@ function buildCastle() {
     buildWalls(castleX, castleY, castleZ, width, height, length);
     buildRoof(castleX, castleY, castleZ, width, height, length);
     placeGlowstone(castleX, castleY, castleZ, width, height, length);
+    buildMoat(castleX, castleY, castleZ, width, length);
 }
 
 function buildFloor(castleX: number, castleY: number, castleZ: number, width: number, length: number) {
@@ -121,6 +122,40 @@ function placeGlowstone(castleX: number, castleY: number, castleZ: number, width
     blocks.place(glowstone, world(castleX + width - 2, castleY + height + 1, castleZ + 1));
     blocks.place(glowstone, world(castleX + 1, castleY + height + 1, castleZ + length - 2));
     blocks.place(glowstone, world(castleX + width - 2, castleY + height + 1, castleZ + length - 2));
+}
+
+function buildMoat(castleX: number, castleY: number, castleZ: number, width: number, length: number) {
+    const water = blocks.block(WATER);
+
+    const expansions: number[] = [];
+    for (let i = 1; i <= 13; i++) {
+        expansions.push(i);
+    }
+
+    for (const expansion of expansions) {
+        for (let i = -expansion; i <= width + expansion - 1; i++) {
+            for (let j = -expansion; j <= length + expansion - 1; j++) {
+                if (i === -expansion || i === width + expansion - 1 || j === -expansion || j === length + expansion - 1) {
+                    for (let k = 0; k >= -2; k--) {
+                        blocks.place(water, world(castleX + i, castleY + k, castleZ + j));
+                    }
+                }
+            }
+        }
+    }
+
+    const bridgeWidth = 3;
+    const bridgeLength = expansions.length;
+    const bridgeHeight = 0;
+
+    const bridgeStartX = castleX + Math.floor(width / 2) - Math.floor(bridgeWidth / 2);
+    const bridgeStartZ = castleZ - bridgeLength;
+
+    for (let i = 0; i < bridgeWidth; i++) {
+        for (let j = 0; j < bridgeLength; j++) {
+            blocks.place(blocks.block(RED_NETHER_BRICK), world(bridgeStartX + i, castleY + bridgeHeight, bridgeStartZ + j));
+        }
+    }
 }
 
 player.onChat("build", buildCastle);
