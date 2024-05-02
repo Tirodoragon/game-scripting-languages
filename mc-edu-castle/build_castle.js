@@ -9,7 +9,7 @@ function buildCastle() {
     let offsetZ: number = 0;
 
     if (playerDirection >= 45 && playerDirection < 135) {
-        offsetX = -29
+        offsetX = -34
         offsetZ = -(width / 2)
     } else if (playerDirection >= 135 || playerDirection < -135) {
         offsetX = -(width / 2)
@@ -45,6 +45,8 @@ function buildWalls(castleX: number, castleY: number, castleZ: number, width: nu
     const bottomWall = blocks.block(BLACKSTONE);
     const wall = blocks.block(NETHER_BRICK);
     const corner = blocks.block(OBSIDIAN);
+    const window = blocks.block(BLACK_STAINED_GLASS);
+
     for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
             const doorWidth = 3;
@@ -54,6 +56,8 @@ function buildWalls(castleX: number, castleY: number, castleZ: number, width: nu
             }
             if (j === 0) {
                 blocks.place(bottomWall, world(castleX + i, castleY + j + 1, castleZ));
+            } else if (((i >= 3 && i <= 4) || (i >= width - 5 && i <= width - 4) || (i === 3 || i === width - 5)) && j > 0 && j < 6) {
+                blocks.place(window, world(castleX + i, castleY + j + 1, castleZ));
             } else if (i === 0 || i === width - 1) {
                 blocks.place(corner, world(castleX + i, castleY + j + 1, castleZ));
             } else {
@@ -66,6 +70,8 @@ function buildWalls(castleX: number, castleY: number, castleZ: number, width: nu
         for (let j = 0; j < height; j++) {
             if (j === 0) {
                 blocks.place(bottomWall, world(castleX + i, castleY + j + 1, castleZ + length - 1));
+            } else if (((i >= 3 && i <= 4) || (i >= width - 5 && i <= width - 4) || (i === 3 || i === width - 5)) && j > 0 && j < 6) {
+                blocks.place(window, world(castleX + i, castleY + j + 1, castleZ + length - 1));
             } else if (i === 0 || i === width - 1) {
                 blocks.place(corner, world(castleX + i, castleY + j + 1, castleZ + length - 1));
             } else {
@@ -79,6 +85,9 @@ function buildWalls(castleX: number, castleY: number, castleZ: number, width: nu
             if (j === 0) {
                 blocks.place(bottomWall, world(castleX, castleY + j + 1, castleZ + i));
                 blocks.place(bottomWall, world(castleX + width - 1, castleY + j + 1, castleZ + i));
+            } else if (((i >= 3 && i <= 4) || (i >= length - 5 && i <= length - 4) || (i === 3 || i === length - 5)) && j > 0 && j < 6) {
+                blocks.place(window, world(castleX, castleY + j + 1, castleZ + i));
+                blocks.place(window, world(castleX + width - 1, castleY + j + 1, castleZ + i));
             } else {
                 blocks.place(wall, world(castleX, castleY + j + 1, castleZ + i));
                 blocks.place(wall, world(castleX + width - 1, castleY + j + 1, castleZ + i));
