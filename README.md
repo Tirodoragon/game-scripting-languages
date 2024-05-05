@@ -42,3 +42,5 @@ https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270
 :white_check_mark: 5.0 [Zamek ma minimum dwa poziomy (piętra) na które można wejść z zewnątrz](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/bbe5bfa37609f2392f3d3e14a24146d91aace594)
 
 Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/mc-edu-castle)
+
+https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/07bfdfbb-4183-433a-84b2-7238bb4baf0f
