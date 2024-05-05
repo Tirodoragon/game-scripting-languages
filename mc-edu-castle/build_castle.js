@@ -30,6 +30,7 @@ function buildCastle() {
     buildWalls(castleX, castleY, castleZ, width, height, length);
     buildRoof(castleX, castleY, castleZ, width, height, length);
     placeGlowstone(castleX, castleY, castleZ, width, height, length);
+    buildTowers(castleX, castleY, castleZ, width, height, length);
     buildMoat(castleX, castleY, castleZ, width, length);
 }
 
@@ -46,13 +47,17 @@ function buildWalls(castleX: number, castleY: number, castleZ: number, width: nu
     const bottomWall = blocks.block(BLACKSTONE);
     const wall = blocks.block(NETHER_BRICK);
     const corner = blocks.block(OBSIDIAN);
+    const gate = blocks.block(NETHER_BRICK_FENCE)
     const window = blocks.block(BLACK_STAINED_GLASS);
 
     for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
             const doorWidth = 3;
             const doorStart = Math.floor((width - doorWidth) / 2);
-            if (i >= doorStart && i < doorStart + doorWidth && j < 3) {
+            if (i >= doorStart && i < doorStart + doorWidth && j < 6) {
+                if (j >= 3 && j <= 6) {
+                    blocks.place(gate, world(castleX + i, castleY + j + 1, castleZ));
+                }
                 continue;
             }
             if (j === 0) {
@@ -154,6 +159,53 @@ function buildMoat(castleX: number, castleY: number, castleZ: number, width: num
     for (let i = 0; i < bridgeWidth; i++) {
         for (let j = 0; j < bridgeLength; j++) {
             blocks.place(blocks.block(RED_NETHER_BRICK), world(bridgeStartX + i, castleY + bridgeHeight, bridgeStartZ + j));
+        }
+    }
+}
+
+function buildTowers(castleX: number, castleY: number, castleZ: number, width: number, height: number, length: number) {
+    const towerWidth = 7;
+    const towerDepth = 7;
+    const towerHeight = height *2;
+
+    const towerPosX1 = castleX;
+    const towerPosX2 = castleX + width - towerWidth;
+
+    const towerBaseY = castleY + height + 2;
+
+    for (let i = 0; i < towerWidth; i++) {
+        for (let j = 0; j < towerDepth; j++) {
+            for (let k = 0; k < towerHeight; k++) {
+                blocks.place(blocks.block(NETHER_BRICK), world(towerPosX1 + i, towerBaseY + k, castleZ + j));
+            }
+        }
+    }
+
+    for (let i = 0; i < towerWidth; i++) {
+        for (let j = 0; j < towerDepth; j++) {
+            for (let k = 0; k < towerHeight; k++) {
+                blocks.place(blocks.block(NETHER_BRICK), world(towerPosX2 + i, towerBaseY + k, castleZ + j));
+            }
+        }
+    }
+
+    for (let i = 0; i < towerWidth; i++) {
+        for (let j = 0; j < towerDepth; j++) {
+            if (i === 0 || i === towerWidth - 1 || j === 0 || j === towerDepth - 1) {
+                if ((i + j) % 2 === 0) {
+                    blocks.place(blocks.block(POLISHED_BLACKSTONE), world(towerPosX1 + i, towerBaseY + towerHeight, castleZ + j));
+                }
+            }
+        }
+    }
+
+    for (let i = 0; i < towerWidth; i++) {
+        for (let j = 0; j < towerDepth; j++) {
+            if (i === 0 || i === towerWidth - 1 || j === 0 || j === towerDepth - 1) {
+                if ((i + j) % 2 === 0) {
+                    blocks.place(blocks.block(POLISHED_BLACKSTONE), world(towerPosX2 + i, towerBaseY + towerHeight, castleZ + j));
+                }
+            }
         }
     }
 }
