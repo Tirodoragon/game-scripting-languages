@@ -28,3 +28,17 @@ https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270
 Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/rasa-chatbot)
 
 https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/c12fe3a1-c7d8-470d-9de4-f0909a0f0368
+
+**Zadanie 3** JS: Zamek w Minecraft
+
+:white_check_mark: 3.0 [Prosty zamek wykorzystując minimum 5 różnych rodzajów bloków](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/e914187562901dd7d6ce3bc68129565abf58b743)
+
+:white_check_mark: 3.5 [Posiada mimum 4 okna](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/ae91d8291f6e890fe7662bf7eca9fc573b50f04b)
+
+:white_check_mark: 4.0 [Posiada fosę oraz most](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/d081127e0bb350c2fc39539f252688bf7db67915)
+
+:white_check_mark: 4.5 [Posiada bramę oraz minimum 2 wieże](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/3037e4ca6c25fd8f4bb4c7a61e4798b315b22f3b)
+
+:white_check_mark: 5.0 [Zamek ma minimum dwa poziomy (piętra) na które można wejść z zewnątrz](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/bbe5bfa37609f2392f3d3e14a24146d91aace594)
+
+Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/mc-edu-castle)
