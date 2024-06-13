@@ -10,7 +10,7 @@ local board = {}
 for y = 1, gridHeight do
   board[y] = {}
   for x = 1, gridWidth do
-    board[y][x] = { shape = 0, color = 0 } -- -- Initialize each cell with no shape and color
+    board[y][x] = { shape = 0, color = 0 } -- Initialize each cell with no shape and color
   end
 end
 
@@ -46,6 +46,9 @@ local fallTimer = 0
 local level = 1
 local score = 0
 local gameOver = false
+
+-- File path for saving game state
+local saveFilePath = "tetris_save.txt"
 
 
 -- Helper functions
@@ -342,8 +345,12 @@ function drawInterface()
   interfaceY = interfaceY + 30
   love.graphics.print("R: Reset", centerX - (getTextWidth("R: Reset") / 2), interfaceY)
   interfaceY = interfaceY + 30
+  love.graphics.print("S: Save", centerX - (getTextWidth("S: Save") / 2), interfaceY)
+  interfaceY = interfaceY + 30
+  love.graphics.print("L: Load", centerX - (getTextWidth("L: Load") / 2), interfaceY)
+  interfaceY = interfaceY + 30
   love.graphics.print("Esc: Exit", centerX - (getTextWidth("Esc: Exit") / 2), interfaceY)
-  interfaceY = interfaceY + 70
+  interfaceY = interfaceY + 50
 
   -- Display game over message
   if gameOver then
@@ -354,6 +361,74 @@ function drawInterface()
     love.graphics.print(gameOverText, centerX - (gameOverTextWidth / 2), interfaceY)
     love.graphics.setColor(1, 1, 1)
   end
+end
+
+-- Save the game state to a file
+function saveGame()
+  local saveData = {
+    board = board,
+    currentShape = currentShape,
+    shapeX = shapeX,
+    shapeY = shapeY,
+    shapeColor = shapeColor,
+    rotationState = rotationState,
+    nextShape = nextShape,
+    nextShapes = nextShapes,
+    fallTimer = fallTimer,
+    level = level,
+    score = score,
+    gameOver = gameOver
+  }
+
+  local saveString = "return " .. tableToString(saveData)
+  love.filesystem.write(saveFilePath, saveString)
+end
+
+-- Convert table to string
+function tableToString(tbl)
+  local result = "{"
+  for k, v in pairs(tbl) do
+    result = result .. "[" .. serialize(k) .. "]=" .. serialize(v) .. ","
+  end
+  result = result .. "}"
+  return result
+end
+
+-- Serialize value to string
+function serialize(value)
+  local valueType = type(value)
+  if valueType == "number" or valueType == "boolean" then
+    return tostring(value)
+  elseif valueType == "string" then
+    return string.format("%q", value)
+  elseif valueType == "table" then
+    return tableToString(value)
+  else
+    error("Unsupported value type: " .. valueType)
+  end
+end
+
+-- Load the game state from a file
+function loadGame()
+  if not love.filesystem.getInfo(saveFilePath) then
+    return
+  end
+
+  local contents = love.filesystem.read(saveFilePath)
+  local saveData = loadstring(contents)()
+
+  board = saveData.board
+  currentShape = saveData.currentShape
+  shapeX = saveData.shapeX
+  shapeY = saveData.shapeY
+  shapeColor = saveData.shapeColor
+  rotationState = saveData.rotationState
+  nextShape = saveData.nextShape
+  nextShapes = saveData.nextShapes
+  fallTimer = saveData.fallTimer
+  level = saveData.level
+  score = saveData.score
+  gameOver = saveData.gameOver
 end
 
 
@@ -399,6 +474,10 @@ function love.update(dt)
       love.event.quit()
     elseif key == "r" then
       resetGame()
+    elseif key == "s" then
+      saveGame()
+    elseif key == "l" then
+      loadGame()
     elseif not gameOver then
       if key == "left" and not checkCollision(currentShape, -1, 0) then
         shapeX = shapeX - 1
