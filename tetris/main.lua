@@ -50,6 +50,14 @@ local gameOver = false
 -- File path for saving game state
 local saveFilePath = "tetris_save.txt"
 
+-- Variables for music
+local backgroundMusic
+local clearSound
+local loseSound
+local moveSound
+local placeSound
+local rotateSound
+
 
 -- Helper functions
 
@@ -132,6 +140,8 @@ function placeShape()
       end
     end
   end
+  love.audio.stop(placeSound)
+  love.audio.play(placeSound)
 end
 
 -- Checks for and removes any complete lines on the game board, updating the score and level
@@ -166,6 +176,11 @@ function removeCompleteLines()
   -- Update score and level based on removed lines
   score = score + linesRemoved * 100
   level = math.floor(score / 1000) + 1
+
+  if linesRemoved > 0 then
+    love.audio.stop(clearSound)
+    love.audio.play(clearSound)
+  end
 end
 
 -- Resets the game to its initial state
@@ -186,6 +201,10 @@ function resetGame()
   refillBag()
   nextShape = table.remove(nextShapes, 1)
   currentShape, shapeX, shapeY, shapeColor, rotationState = newShape()
+
+  -- Restart background music
+  love.audio.stop(backgroundMusic)
+  love.audio.play(backgroundMusic)
 end
 
 -- Rotates the given shape clockwise
@@ -231,6 +250,8 @@ function rotateShape()
 
   if not checkCollision(newShape, 0, 0) then
     currentShape = newShape
+    love.audio.stop(rotateSound)
+    love.audio.play(rotateSound)
   end
 end
 
@@ -360,6 +381,8 @@ function drawInterface()
     local gameOverTextWidth = getTextWidth(gameOverText)
     love.graphics.print(gameOverText, centerX - (gameOverTextWidth / 2), interfaceY)
     love.graphics.setColor(1, 1, 1)
+    love.audio.stop(backgroundMusic)
+    love.audio.play(loseSound)
   end
 end
 
@@ -440,6 +463,16 @@ function love.load()
   refillBag()
   nextShape = table.remove(nextShapes, 1)
   currentShape, shapeX, shapeY, shapeColor, rotationState = newShape()
+
+  backgroundMusic = love.audio.newSource("audio/background_music.mp3", "stream")
+  backgroundMusic:setLooping(true)
+  love.audio.play(backgroundMusic)
+
+  clearSound = love.audio.newSource("audio/clear.wav", "static")
+  loseSound = love.audio.newSource("audio/lose.ogg", "static")
+  moveSound = love.audio.newSource("audio/move.wav", "static")
+  placeSound = love.audio.newSource("audio/place.wav", "static")
+  rotateSound = love.audio.newSource("audio/rotate.wav", "static")
 end
 
 function love.update(dt)
@@ -466,6 +499,10 @@ function love.update(dt)
       end
       fallTimer = 0
     end
+
+    -- Adjust music playback speed based on the current level
+    local playbackRate = 1 + (level - 1) * 0.1
+    backgroundMusic:setPitch(playbackRate)
   end
 
   -- Handles user inputs
@@ -481,8 +518,12 @@ function love.update(dt)
     elseif not gameOver then
       if key == "left" and not checkCollision(currentShape, -1, 0) then
         shapeX = shapeX - 1
+        love.audio.stop(moveSound)
+        love.audio.play(moveSound)
       elseif key == "right" and not checkCollision(currentShape, 1, 0) then
         shapeX = shapeX + 1
+        love.audio.stop(moveSound)
+        love.audio.play(moveSound)
       elseif key == "up" then
         rotateShape()
       end
