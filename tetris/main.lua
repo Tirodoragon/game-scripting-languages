@@ -43,6 +43,9 @@ local currentShape, shapeX, shapeY, shapeColor, rotationState
 local nextShape
 local nextShapes = {}
 local fallTimer = 0
+local clearAnimation = false
+local clearAnimationTime = 0
+local clearLines = {}
 local level = 1
 local score = 0
 local gameOver = false
@@ -144,10 +147,17 @@ function placeShape()
   love.audio.play(placeSound)
 end
 
+-- Starts the line-clearing animation by setting the necessary state variables
+function startClearAnimation(lines)
+  clearAnimation = true
+  clearAnimationTime = 0
+  clearLines = lines
+end
+
 -- Checks for and removes any complete lines on the game board, updating the score and level
 function removeCompleteLines()
-  local newBoard = {}
-
+  local linesToClear = {}
+  
   for y = 1, gridHeight do
     local full = true
     for x = 1, gridWidth do
@@ -156,30 +166,13 @@ function removeCompleteLines()
         break
       end
     end
-
-    if not full then
-      table.insert(newBoard, board[y])
+    if full then
+      table.insert(linesToClear, y)
     end
   end
-
-  local linesRemoved = gridHeight - #newBoard
-
-  for i = 1, linesRemoved do
-    table.insert(newBoard, 1, {})
-    for x = 1, gridWidth do
-      newBoard[1][x] = { shape = 0, color = 0 }
-    end
-  end
-
-  board = newBoard
-
-  -- Update score and level based on removed lines
-  score = score + linesRemoved * 100
-  level = math.floor(score / 1000) + 1
-
-  if linesRemoved > 0 then
-    love.audio.stop(clearSound)
-    love.audio.play(clearSound)
+  
+  if #linesToClear > 0 then
+    startClearAnimation(linesToClear)
   end
 end
 
@@ -255,6 +248,16 @@ function rotateShape()
   end
 end
 
+-- Utility function to check if a table contains a value
+function table.contains(table, element)
+  for _, value in pairs(table) do
+    if value == element then
+      return true
+    end
+  end
+  return false
+end
+
 -- Draws the current state of the game board
 local function drawBoard()
   for y = 1, gridHeight do
@@ -263,8 +266,14 @@ local function drawBoard()
       if block.shape > 0 then
         local color = colors[block.color]
         
+        if clearAnimation and table.contains(clearLines, y) then
+          local alpha = 1 - (clearAnimationTime / 0.5)
+          love.graphics.setColor(color[1], color[2], color[3], alpha)
+        else
+          love.graphics.setColor(color)
+        end
+
         -- Draw the main block
-        love.graphics.setColor(color)
         love.graphics.rectangle("fill", (x - 1) * blockSize, (y - 1) * blockSize, blockSize, blockSize)
         
         -- Draw the border
@@ -478,31 +487,63 @@ end
 function love.update(dt)
   local frameStart = love.timer.getTime()
 
-  if not gameOver then
-    local currentFallSpeed = calculateFallSpeed(level)
-    if love.keyboard.isDown("down") then
-      currentFallSpeed = currentFallSpeed / 20
-    end
-    
-    fallTimer = fallTimer + dt
-
-    if fallTimer >= currentFallSpeed then
-      if checkCollision(currentShape, 0, 1) then
-        placeShape()
-        removeCompleteLines()
-        currentShape, shapeX, shapeY, shapeColor, rotationState = newShape()
-        if checkCollision(currentShape, 0, 0) then
-          gameOver = true
+  if clearAnimation then
+    clearAnimationTime = clearAnimationTime + dt
+    if clearAnimationTime >= 0.5 then -- Animation duration (0.5 seconds)
+      -- Remove the lines
+      local newBoard = {}
+      for y = 1, gridHeight do
+        if not table.contains(clearLines, y) then
+          table.insert(newBoard, board[y])
         end
-      else
-        shapeY = shapeY + 1
       end
-      fallTimer = 0
-    end
 
-    -- Adjust music playback speed based on the current level
-    local playbackRate = 1 + (level - 1) * 0.1
-    backgroundMusic:setPitch(playbackRate)
+      for i = 1, #clearLines do
+        table.insert(newBoard, 1, {})
+        for x = 1, gridWidth do
+          newBoard[1][x] = { shape = 0, color = 0 }
+        end
+      end
+
+      board = newBoard
+
+      -- Update score and level
+      score = score + #clearLines * 100
+      level = math.floor(score / 1000) + 1
+
+      love.audio.stop(clearSound)
+      love.audio.play(clearSound)
+
+      clearAnimation = false
+      clearLines = {}
+    end
+  else
+    if not gameOver then
+      local currentFallSpeed = calculateFallSpeed(level)
+      if love.keyboard.isDown("down") then
+        currentFallSpeed = currentFallSpeed / 20
+      end
+      
+      fallTimer = fallTimer + dt
+
+      if fallTimer >= currentFallSpeed then
+        if checkCollision(currentShape, 0, 1) then
+          placeShape()
+          removeCompleteLines()
+          currentShape, shapeX, shapeY, shapeColor, rotationState = newShape()
+          if checkCollision(currentShape, 0, 0) then
+            gameOver = true
+          end
+        else
+          shapeY = shapeY + 1
+        end
+        fallTimer = 0
+      end
+
+      -- Adjust music playback speed based on the current level
+      local playbackRate = 1 + (level - 1) * 0.1
+      backgroundMusic:setPitch(playbackRate)
+    end
   end
 
   -- Handles user inputs
