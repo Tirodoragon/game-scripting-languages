@@ -9,7 +9,7 @@ The code I wrote during the Game Scripting Languages course at the Jagiellonian 
 
 :white_check_mark: 5.0 [pozwala na grę z komputerem](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/2897976e6b39562a2913344416c1c775434a28d5)
 
-Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/tic-tac-toe)
+Kod: [tic-tac-toe](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/tic-tac-toe)
 
 https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/dc02aebb-407b-41ef-85c4-f94acef9bf1d
 
@@ -25,7 +25,7 @@ https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270
 
 :white_check_mark: 5.0 [Chatbot should ask and confirm the delivery address instead of pick-up option](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/840c015b3fb81c25d913ac1bb0123d7db5ef7f0f)
 
-Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/rasa-chatbot)
+Kod: [rasa-chatbot](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/rasa-chatbot)
 
 https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/c12fe3a1-c7d8-470d-9de4-f0909a0f0368
 
@@ -41,6 +41,20 @@ https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270
 
 :white_check_mark: 5.0 [Zamek ma minimum dwa poziomy (piętra) na które można wejść z zewnątrz](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/bbe5bfa37609f2392f3d3e14a24146d91aace594)
 
-Kod: [folder](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/mc-edu-castle)
+Kod: [mc-edu-castle](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/mc-edu-castle)
 
 https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/07bfdfbb-4183-433a-84b2-7238bb4baf0f
+
+**Zadanie 4** Tetris w Lua
+
+:white_check_mark: 3.0 [Postawowa wersja dekstopowa z obsługą na klawiaturze - minimum 4 rodzaje klocków](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/89663f9883a5855573935fb1d4ef030372b2ee5f)
+
+:white_check_mark: 3.5 [Zapis i odczyt gier](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/c8a0a221cf88a8de03c197fa54c53f43da8a106f)
+
+:white_check_mark: 4.0 [Dodanie efektów dźwiękowych przy akcjach](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/d21fb390c75e0e1195ac55cf0a2a6090a9fcae8f)
+
+:white_check_mark: 4.5 [Dodanie animacji przy zbijaniu klocków](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/67814e44fb065498a04655e2686457b14ed984fd)
+
+:white_check_mark: 5.0 [Wersja na iOS lub Android z implementacją touch zamiast klawiatury](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/f66dd56d53172f6f95a0955c6ff0dff927cd1326)
+
+Kod: [tetris](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/tetris)
