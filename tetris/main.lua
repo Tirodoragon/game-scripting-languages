@@ -5,6 +5,20 @@
 local gridWidth, gridHeight = 10, 20 -- Width and height of the game grid
 local blockSize = 35 -- Size of each block in pixels
 
+-- Detect if the game is running on a touch device
+local isTouchDevice = love.system.getOS() == "Android" or love.system.getOS() == "iOS"
+
+-- Define interface width for PC
+local interfaceWidth = 250
+
+-- Define interface width for touch device
+if isTouchDevice then
+  local screenWidth, screenHeight = love.graphics.getDimensions()
+  interfaceWidth = screenWidth * 0.3
+  local availableWidth = screenWidth - interfaceWidth
+  blockSize = math.min(availableWidth / gridWidth, screenHeight / gridHeight)
+end
+
 -- Board initialization
 local board = {}
 for y = 1, gridHeight do
@@ -61,6 +75,13 @@ local moveSound
 local placeSound
 local rotateSound
 
+-- Button definitions for touch controls
+local buttons = {
+  reset = {x = 0, y = 0, width = 100, height = 25, label = "Reset"},
+  save = {x = 0, y = 0, width = 100, height = 25, label = "Save"},
+  load = {x = 0, y = 0, width = 100, height = 25, label = "Load"}
+}
+
 
 -- Helper functions
 
@@ -92,7 +113,7 @@ function newShape()
     refillBag()
   end
   nextShape = table.remove(nextShapes, 1)
-  
+
   return shape, math.floor(gridWidth / 2) - math.floor(#shape[1] / 2) + 1, 0, shape.color, 1
 end
 
@@ -106,10 +127,10 @@ function calculateFallSpeed(level)
     [21] = 2, [22] = 2, [23] = 2, [24] = 2, [25] = 2,
     [26] = 2, [27] = 2, [28] = 2, [29] = 2, [30] = 1
   }
-  
+
   -- Levels 30 and above have a speed value of 1
   level = math.min(level, 30)
-  
+
   -- Calculate delay based on level (assuming 60fps)
   return speeds[level] / 60 or 1 / 60
 end
@@ -157,7 +178,7 @@ end
 -- Checks for and removes any complete lines on the game board, updating the score and level
 function removeCompleteLines()
   local linesToClear = {}
-  
+
   for y = 1, gridHeight do
     local full = true
     for x = 1, gridWidth do
@@ -170,7 +191,7 @@ function removeCompleteLines()
       table.insert(linesToClear, y)
     end
   end
-  
+
   if #linesToClear > 0 then
     startClearAnimation(linesToClear)
   end
@@ -270,14 +291,14 @@ local function drawBoard()
           local alpha = 1 - (clearAnimationTime / 0.5)
           love.graphics.setColor(color[1], color[2], color[3], alpha)
         else
-          love.graphics.setColor(color)
+          love.graphics.setColor(color[1], color[2], color[3], 1)
         end
 
         -- Draw the main block
         love.graphics.rectangle("fill", (x - 1) * blockSize, (y - 1) * blockSize, blockSize, blockSize)
         
         -- Draw the border
-        love.graphics.setColor(0, 0, 0)
+        love.graphics.setColor(0, 0, 0, 1)
         love.graphics.rectangle("line", (x - 1) * blockSize, (y - 1) * blockSize, blockSize, blockSize)
       end
     end
@@ -292,11 +313,11 @@ local function drawShape()
         local color = colors[shapeColor]
         
         -- Draw the main block
-        love.graphics.setColor(color)
+        love.graphics.setColor(color[1], color[2], color[3], 1)
         love.graphics.rectangle("fill", (shapeX + x - 2) * blockSize, (shapeY + y - 2) * blockSize, blockSize, blockSize)
         
         -- Draw the border
-        love.graphics.setColor(0, 0, 0)
+        love.graphics.setColor(0, 0, 0, 1)
         love.graphics.rectangle("line", (shapeX + x - 2) * blockSize, (shapeY + y - 2) * blockSize, blockSize, blockSize)
       end
     end
@@ -310,10 +331,10 @@ local function drawNextShape(startX, interfaceY)
       if cell == 1 then
         local color = colors[nextShape.color]
         
-        love.graphics.setColor(color)
+        love.graphics.setColor(color[1], color[2], color[3], 1)
         love.graphics.rectangle("fill", startX + (x - 1) * blockSize, interfaceY + (y - 1) * blockSize, blockSize, blockSize)
         
-        love.graphics.setColor(0, 0, 0)
+        love.graphics.setColor(0, 0, 0, 1)
         love.graphics.rectangle("line", startX + (x - 1) * blockSize, interfaceY + (y - 1) * blockSize, blockSize, blockSize)
       end
     end
@@ -322,74 +343,165 @@ end
 
 -- Draws the interface including level, score, next piece preview, controls, and game over message
 function drawInterface()
+  local screenWidth, screenHeight = love.graphics.getDimensions()
   local interfaceX = gridWidth * blockSize
-  local interfaceY = 0
-  local interfaceWidth = 250
-  local interfaceHeight = love.graphics.getHeight()
+  local interfaceHeight = gridHeight * blockSize
+  local rectangleHeight = (screenHeight - interfaceHeight) / 2
 
-  love.graphics.setColor(0.5, 0.5, 0.5)
-  love.graphics.rectangle("fill", interfaceX, interfaceY, interfaceWidth, interfaceHeight)
-  love.graphics.setColor(1, 1, 1)
+  love.graphics.setColor(0.5, 0.5, 0.5, 1)
+  love.graphics.rectangle("fill", interfaceX, rectangleHeight, interfaceWidth, interfaceHeight)
+  love.graphics.setColor(1, 1, 1, 1)
 
   local function getTextWidth(text)
     return love.graphics.getFont():getWidth(text)
   end
 
   local centerX = interfaceX + (interfaceWidth / 2)
+  local interfaceY = rectangleHeight
 
-  love.graphics.setFont(love.graphics.newFont(30))
+  if isTouchDevice then
+    love.graphics.setFont(love.graphics.newFont(20))
+  else
+    love.graphics.setFont(love.graphics.newFont(30))
+  end
 
   -- Display level
   local levelText = "Level: " .. level
   local levelTextWidth = getTextWidth(levelText)
   love.graphics.print(levelText, centerX - (levelTextWidth / 2), interfaceY)
-  interfaceY = interfaceY + 50
+  if isTouchDevice then
+    interfaceY = interfaceY + 25
+  else
+    interfaceY = interfaceY + 50
+  end
 
-  love.graphics.setFont(love.graphics.newFont(20))
+  if isTouchDevice then
+    love.graphics.setFont(love.graphics.newFont(14))
+  else
+    love.graphics.setFont(love.graphics.newFont(20))
+  end
 
   -- Display score
   local scoreText = "Score: " .. score
   local scoreTextWidth = getTextWidth(scoreText)
   love.graphics.print(scoreText, centerX - (scoreTextWidth / 2), interfaceY)
-  interfaceY = interfaceY + 100
+  if isTouchDevice then
+    interfaceY = interfaceY + 35
+  else
+    interfaceY = interfaceY + 70
+  end
 
-  love.graphics.setFont(love.graphics.newFont(30))
+  if isTouchDevice then
+    love.graphics.setFont(love.graphics.newFont(18))
+  else
+    love.graphics.setFont(love.graphics.newFont(30))
+  end
 
   -- Display next piece
   love.graphics.print("Next Piece:", centerX - (getTextWidth("Next Piece:") / 2), interfaceY)
+  if isTouchDevice then
+    interfaceY = interfaceY + 20
+  else
+    interfaceY = interfaceY + 30
+  end
   local nextPieceWidth = #nextShape[1] * blockSize
   local startX = centerX - (nextPieceWidth / 2)
-  interfaceY = interfaceY + 25
   drawNextShape(startX, interfaceY)
-  interfaceY = interfaceY + 175
+
+  if isTouchDevice then
+    interfaceY = interfaceY + 120
+  else
+    interfaceY = interfaceY + 175
+  end
 
   -- Display controls
   love.graphics.print("Controls:", centerX - (getTextWidth("Controls:") / 2), interfaceY)
-  interfaceY = interfaceY + 50
-  love.graphics.setFont(love.graphics.newFont(20))
-  love.graphics.print("Left/Right Arrows: Move", centerX - (getTextWidth("Left/Right Arrows: Move") / 2), interfaceY)
-  interfaceY = interfaceY + 30
-  love.graphics.print("Up Arrow: Rotate", centerX - (getTextWidth("Up Arrow: Rotate") / 2), interfaceY)
-  interfaceY = interfaceY + 30
-  love.graphics.print("Down Arrow: Accelerate", centerX - (getTextWidth("Down Arrow: Accelerate") / 2), interfaceY)
-  interfaceY = interfaceY + 30
-  love.graphics.print("R: Reset", centerX - (getTextWidth("R: Reset") / 2), interfaceY)
-  interfaceY = interfaceY + 30
-  love.graphics.print("S: Save", centerX - (getTextWidth("S: Save") / 2), interfaceY)
-  interfaceY = interfaceY + 30
-  love.graphics.print("L: Load", centerX - (getTextWidth("L: Load") / 2), interfaceY)
-  interfaceY = interfaceY + 30
-  love.graphics.print("Esc: Exit", centerX - (getTextWidth("Esc: Exit") / 2), interfaceY)
-  interfaceY = interfaceY + 50
+  if isTouchDevice then
+    interfaceY = interfaceY + 25
+  else
+    interfaceY = interfaceY + 50
+  end
+  if isTouchDevice then
+    love.graphics.setFont(love.graphics.newFont(10))
+  else
+    love.graphics.setFont(love.graphics.newFont(20))
+  end
+
+  if isTouchDevice then
+    love.graphics.print("Touch Left Side:", centerX - (getTextWidth("Touch Left Side:") / 2), interfaceY)
+    interfaceY = interfaceY + 10
+    love.graphics.print("Move Left", centerX - (getTextWidth("Move Left") / 2), interfaceY)
+    interfaceY = interfaceY + 20
+    love.graphics.print("Touch Right Side:", centerX - (getTextWidth("Touch Right Side:") / 2), interfaceY)
+    interfaceY = interfaceY + 10
+    love.graphics.print("Move Right", centerX - (getTextWidth("Move Right") / 2), interfaceY)
+    interfaceY = interfaceY + 20
+    love.graphics.print("Touch Top:", centerX - (getTextWidth("Touch Top:") / 2), interfaceY)
+    interfaceY = interfaceY + 10
+    love.graphics.print("Rotate", centerX - (getTextWidth("Rotate") / 2), interfaceY)
+    interfaceY = interfaceY + 20
+    love.graphics.print("Touch Bottom:", centerX - (getTextWidth("Touch Bottom:") / 2), interfaceY)
+    interfaceY = interfaceY + 10
+    love.graphics.print("Accelerate", centerX - (getTextWidth("Accelerate") / 2), interfaceY)
+  else
+    love.graphics.print("Left/Right Arrows: Move", centerX - (getTextWidth("Left/Right Arrows: Move") / 2), interfaceY)
+    interfaceY = interfaceY + 30
+    love.graphics.print("Up Arrow: Rotate", centerX - (getTextWidth("Up Arrow: Rotate") / 2), interfaceY)
+    interfaceY = interfaceY + 30
+    love.graphics.print("Down Arrow: Accelerate", centerX - (getTextWidth("Down Arrow: Accelerate") / 2), interfaceY)
+    interfaceY = interfaceY + 30
+    love.graphics.print("R: Reset", centerX - (getTextWidth("R: Reset") / 2), interfaceY)
+    interfaceY = interfaceY + 30
+    love.graphics.print("S: Save", centerX - (getTextWidth("S: Save") / 2), interfaceY)
+    interfaceY = interfaceY + 30
+    love.graphics.print("L: Load", centerX - (getTextWidth("L: Load") / 2), interfaceY)
+    interfaceY = interfaceY + 70
+  end
+
+  -- Draw buttons for touch devices
+  if isTouchDevice then
+    interfaceY = interfaceY + 10
+    buttons.reset.x = centerX - buttons.reset.width / 2
+    buttons.reset.y = interfaceY + rectangleHeight
+    interfaceY = interfaceY + buttons.reset.height + 10
+
+    buttons.save.x = centerX - buttons.save.width / 2
+    buttons.save.y = interfaceY + rectangleHeight
+    interfaceY = interfaceY + buttons.save.height + 10
+
+    buttons.load.x = centerX - buttons.load.width / 2
+    buttons.load.y = interfaceY + rectangleHeight
+    interfaceY = interfaceY + buttons.load.height + 10
+
+    for _, button in pairs(buttons) do
+      love.graphics.setColor(0.7, 0.7, 0.7, 1)
+      love.graphics.rectangle("fill", button.x, button.y, button.width, button.height)
+      love.graphics.setColor(0, 0, 0, 1)
+      love.graphics.rectangle("line", button.x, button.y, button.width, button.height)
+      love.graphics.printf(button.label, button.x, button.y + button.height / 4, button.width, "center")
+    end
+  end
 
   -- Display game over message
   if gameOver then
-    love.graphics.setColor(1, 0, 0)
-    love.graphics.setFont(love.graphics.newFont(40))
-    local gameOverText = "Game Over!"
-    local gameOverTextWidth = getTextWidth(gameOverText)
-    love.graphics.print(gameOverText, centerX - (gameOverTextWidth / 2), interfaceY)
-    love.graphics.setColor(1, 1, 1)
+    love.graphics.setColor(1, 0, 0, 1)
+    
+    if isTouchDevice then
+      local topRectangleCenterY = rectangleHeight / 2
+      love.graphics.setFont(love.graphics.newFont(38))
+      local gameOverText1 = "Game"
+      local gameOverText2 = "Over!"
+      local gameOverTextWidth1 = getTextWidth(gameOverText1)
+      local gameOverTextWidth2 = getTextWidth(gameOverText2)
+      love.graphics.print(gameOverText1, centerX - (gameOverTextWidth1 / 2), topRectangleCenterY - 60)
+      love.graphics.print(gameOverText2, centerX - (gameOverTextWidth2 / 2), topRectangleCenterY - 20)
+    else
+      love.graphics.setFont(love.graphics.newFont(40))
+      local gameOverText = "Game Over!"
+      local gameOverTextWidth = getTextWidth(gameOverText)
+      love.graphics.print(gameOverText, centerX - (gameOverTextWidth / 2), interfaceY)
+    end
+    love.graphics.setColor(1, 1, 1, 1)
     love.audio.stop(backgroundMusic)
     love.audio.play(loseSound)
   end
@@ -461,6 +573,9 @@ function loadGame()
   level = saveData.level
   score = saveData.score
   gameOver = saveData.gameOver
+
+  love.audio.stop(backgroundMusic)
+  love.audio.play(backgroundMusic)
 end
 
 
@@ -482,6 +597,9 @@ function love.load()
   moveSound = love.audio.newSource("audio/move.wav", "static")
   placeSound = love.audio.newSource("audio/place.wav", "static")
   rotateSound = love.audio.newSource("audio/rotate.wav", "static")
+
+  -- Detect if the game is running on a touch device
+  isTouchDevice = love.system.getOS() == "Android" or love.system.getOS() == "iOS"
 end
 
 function love.update(dt)
@@ -489,7 +607,7 @@ function love.update(dt)
 
   if clearAnimation then
     clearAnimationTime = clearAnimationTime + dt
-    if clearAnimationTime >= 0.5 then -- Animation duration (0.5 seconds)
+    if clearAnimationTime >= 0.5 then
       -- Remove the lines
       local newBoard = {}
       for y = 1, gridHeight do
@@ -520,7 +638,7 @@ function love.update(dt)
   else
     if not gameOver then
       local currentFallSpeed = calculateFallSpeed(level)
-      if love.keyboard.isDown("down") then
+      if love.keyboard.isDown("down") or isAccelerating then
         currentFallSpeed = currentFallSpeed / 20
       end
       
@@ -571,6 +689,59 @@ function love.update(dt)
     end
   end
 
+  -- Handle touch inputs
+  function love.touchpressed(id, x, y, dx, dy, pressure)
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
+
+    local topArea = screenHeight * 0.2
+    local bottomArea = screenHeight * 0.8
+    local interfaceHeight = gridHeight * blockSize
+    local rectangleHeight = (screenHeight - interfaceHeight) / 2
+
+    -- Check if the touch is within the grid area
+    if y > rectangleHeight and y < screenHeight - rectangleHeight and x < screenWidth - interfaceWidth then
+      if not gameOver then
+        if y < topArea then
+          rotateShape()
+        elseif y > bottomArea then
+          isAccelerating = true
+        else
+          if x < screenWidth / 2 then
+            if not checkCollision(currentShape, -1, 0) then
+              shapeX = shapeX - 1
+              love.audio.stop(moveSound)
+              love.audio.play(moveSound)
+            end
+          else
+            if not checkCollision(currentShape, 1, 0) then
+              shapeX = shapeX + 1
+              love.audio.stop(moveSound)
+              love.audio.play(moveSound)
+            end
+          end
+        end
+      end
+    end
+
+    -- Check if any button is pressed
+    for _, button in pairs(buttons) do
+      if x >= button.x and x <= button.x + button.width and y >= button.y and y <= button.y + button.height then
+        if button.label == "Reset" then
+          resetGame()
+        elseif button.label == "Save" then
+          saveGame()
+        elseif button.label == "Load" then
+          loadGame()
+        end
+      end
+    end
+  end
+
+  function love.touchreleased(id, x, y, dx, dy, pressure)
+    isAccelerating = false
+  end
+
   -- Limit framerate to 60fps
   local frameEnd = love.timer.getTime()
   local frameDuration = frameEnd - frameStart
@@ -581,7 +752,26 @@ end
 
 -- Draws the game board, current shape, and the game interface
 function love.draw()
+  local rectangleHeight = 0
+  if isTouchDevice then
+    local screenWidth, screenHeight = love.graphics.getDimensions()
+    local interfaceHeight = gridHeight * blockSize
+    rectangleHeight = (screenHeight - interfaceHeight) / 2
+
+    love.graphics.setColor(0.5, 0.5, 0.5, 1)
+    love.graphics.rectangle("fill", 0, 0, screenWidth, rectangleHeight)
+    love.graphics.rectangle("fill", 0, screenHeight - rectangleHeight, screenWidth, rectangleHeight)
+    love.graphics.setColor(1, 1, 1, 1) -- Reset color
+  end
+
+  love.graphics.push()
+  love.graphics.translate(0, rectangleHeight)
+  -- Clip the drawing area to exclude the top and bottom rectangles
+  love.graphics.setScissor(0, rectangleHeight, love.graphics.getWidth(), love.graphics.getHeight() - 2 * rectangleHeight)
   drawBoard()
   drawShape()
+  love.graphics.setScissor()
+  love.graphics.pop()
+
   drawInterface()
 end
