@@ -58,3 +58,5 @@ https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270
 :white_check_mark: 5.0 [Wersja na iOS lub Android z implementacją touch zamiast klawiatury](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/f66dd56d53172f6f95a0955c6ff0dff927cd1326)
 
 Kod: [tetris](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/tetris)
+
+https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/c7476361-add6-4559-a290-b3cacb1bbd84
