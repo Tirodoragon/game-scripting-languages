@@ -60,3 +60,17 @@ https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270
 Kod: [tetris](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/tetris)
 
 https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/c7476361-add6-4559-a290-b3cacb1bbd84
+
+**Zadanie 5** Crawler w Ruby
+
+:white_check_mark: 3.0 [Należy pobrać podstawowe dane o produktach (tytuł, cena), dowolna kategoria](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/c628af0e0d4c7df294648469947b1765a85333e2)
+
+:white_check_mark: 3.5 [Należy pobrać podstawowe dane o produktach wg słów kluczowych](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/df2a270d9245b3644ba05d76fba3590f9c8ce294)
+
+:white_check_mark: 4.0 [Należy rozszerzyć dane o produktach o dane szczegółowe widoczne tylko na podstronie o produkcie](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/de3fb9c62a3bd5a31a434081a743ba002a3dd5ad)
+
+:white_check_mark: 4.5 [Należy zapisać linki do produktów](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/75d105ac56afef3f758e62e2d1156f8a097cf9cf)
+
+:white_check_mark: 5.0 [Dane należy zapisać w bazie danych np. SQLite via Sequel](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/f98f07734c5288c958bd077fe9d5062c436a00fe)
+
+Kod: [crawler](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/crawler)
