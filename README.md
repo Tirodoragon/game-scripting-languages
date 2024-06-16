@@ -74,3 +74,5 @@ https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270
 :white_check_mark: 5.0 [Dane należy zapisać w bazie danych np. SQLite via Sequel](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/commit/f98f07734c5288c958bd077fe9d5062c436a00fe)
 
 Kod: [crawler](https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/tree/main/crawler)
+
+https://github.com/Tirodoragon/game-scripting-languages-JU-23-24/assets/56449270/05352ea6-c050-471d-877a-25b9c5c8c60a
