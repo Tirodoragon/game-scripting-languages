@@ -124,6 +124,7 @@ def display_products(products, keyword)
     subpage = fetch_page(info[:link])
     additional_info = extract_additional_info(subpage)
     puts "Produkt: #{info[:title]}"
+    puts "Link: #{info[:link]}"
     puts "Cena: #{info[:price]}"
     
     if additional_info[:system]
