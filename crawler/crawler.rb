@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'httparty'
+require 'sequel'
 
 HEADERS = {
   "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
@@ -7,6 +8,27 @@ HEADERS = {
   "Accept-Encoding" => "gzip, deflate, br, zstd",
   "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.7",
 }
+
+DB = Sequel.sqlite('products.db')
+
+DB.create_table? :products do
+  primary_key :id
+  String :title
+  String :price
+  String :link
+  String :color
+  String :description
+  String :item_weight
+  String :material
+  String :memory
+  String :model_year
+  String :system
+  String :theme
+end
+
+PRODUCTS_TABLE = DB[:products]
+
+PRODUCTS_TABLE.delete
 
 def fetch_page(url)
   response = HTTParty.get(url, headers: HEADERS)
@@ -48,6 +70,7 @@ def extract_additional_info(subpage)
   model_year_info = nil
   system_info = nil
   theme_info = nil
+  description_info = nil
 
   tr = subpage.css('tr.a-spacing-small.po-color')
   unless tr.empty?
@@ -116,7 +139,7 @@ def extract_additional_info(subpage)
   }
 end
 
-def display_products(products, keyword)
+def display_products(products, keyword, products_table)
   capitalized_keyword = keyword.split.map.with_index { |word, index| index == 0 ? word.capitalize : word }.join(' ')
   products.each_with_index do |product, index|
     info = extract_product_info(product)
@@ -126,31 +149,45 @@ def display_products(products, keyword)
     puts "Produkt: #{info[:title]}"
     puts "Link: #{info[:link]}"
     puts "Cena: #{info[:price]}"
-    
+
+    products_table.insert(
+      title: info[:title],
+      price: info[:price],
+      link: info[:link],
+      color: additional_info[:color],
+      description: additional_info[:description],
+      item_weight: additional_info[:item_weight],
+      material: additional_info[:material],
+      memory: additional_info[:memory],
+      model_year: additional_info[:model_year],
+      system: additional_info[:system],
+      theme: additional_info[:theme]
+    )
+
     if additional_info[:system]
       puts additional_info[:system] unless additional_info[:system].to_s.strip.empty?
     end
-    
+
     if additional_info[:memory]
       puts additional_info[:memory] unless additional_info[:memory].to_s.strip.empty?
     end
-    
+
     if additional_info[:color]
       puts additional_info[:color] unless additional_info[:color].to_s.strip.empty?
     end
-    
+
     if additional_info[:model_year]
       puts additional_info[:model_year] unless additional_info[:model_year].to_s.strip.empty?
     end
-    
+
     if additional_info[:item_weight]
       puts additional_info[:item_weight] unless additional_info[:item_weight].to_s.strip.empty?
     end
-    
+
     if additional_info[:theme]
       puts additional_info[:theme] unless additional_info[:theme].to_s.strip.empty?
     end
-    
+
     if additional_info[:material]
       puts additional_info[:material] unless additional_info[:material].to_s.strip.empty?
     end
@@ -158,13 +195,13 @@ def display_products(products, keyword)
     if additional_info[:description]
       puts additional_info[:description] unless additional_info[:description].to_s.strip.empty?
     end
-    
+
     puts "\n\n" unless index == products.size - 1
   end
 end
 
 if ARGV.empty?
-  puts "Usage: ruby script_name.rb <keyword1> <keyword2> ... <keywordN>"
+  puts "Usage: ruby amazon_scraper.rb <keyword1> <keyword2> ... <keywordN>"
   exit
 end
 
@@ -177,4 +214,4 @@ all_products = []
   all_products.concat(products)
 end
 
-display_products(all_products, keyword)
+display_products(all_products, keyword, PRODUCTS_TABLE)
